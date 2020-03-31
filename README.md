@@ -20,6 +20,6 @@ docker run --name OPCServer -p 1010:50000 mcr.microsoft.com/iotedge/opc-plc --aa
  - OPC UA Expert (Client) - https://uaexpert.software.informer.com/download/
  - Grafana: https://grafana.com/
  - Prometheus: https://prometheus.io/
- 
+ - IOT Edge: Alternative to use instead of Collection Service: https://azure.microsoft.com/en-us/services/iot-edge/
  
   
