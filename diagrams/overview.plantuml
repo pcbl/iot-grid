@@ -1,6 +1,42 @@
-@startuml firstDiagram
+@startuml
+title IOT Grid
 
-Alice -> Pedro: Hello
-Pedro -> Alice: Hi!
-		
+package "On-Premises" {
+    component [Machine (Docker)] as MACHINE 
+    component [Adapter] as ADAPTER
+}
+
+package "User Services" {
+    component [Browser] as BROWSER
+}
+
+:End User: as END_USER
+
+cloud WEB {
+}
+ 
+package "Online Services\n(Serverless/Container/PAAS as Target)" {
+    component [API Management] as API
+    component [Grafana] as GRAFANA
+    note left of API : OPEN API Specification
+    component [Collection Service] as COLLECTION
+    note left of COLLECTION : Azure Function / Serverless
+    component [Reverse Proxy\n(Optional)] as REVERSE_PROXY
+    database "Prometheus\n" {
+        [Machine Data] as MACHINE_DATA
+    }
+} 
+
+MACHINE -right-> ADAPTER : OPC UA
+ADAPTER -down-> WEB : OAuth2 (Access Token)
+COLLECTION -up-> API : Open API
+WEB -down-> API
+COLLECTION .. [MACHINE_DATA]
+
+REVERSE_PROXY -down-> [GRAFANA] #Blue
+GRAFANA -down-> [MACHINE_DATA] #Blue
+BROWSER -down-> WEB #Blue
+WEB -down-> [REVERSE_PROXY] #Blue : http/https 
+END_USER -left-> BROWSER #Blue
+
 @enduml
