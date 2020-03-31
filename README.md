@@ -29,6 +29,7 @@ docker run --name OPCServer -p 1010:50000 mcr.microsoft.com/iotedge/opc-plc --aa
 ```
 2. Connect to the Simulation using OPC UA CLient (https://uaexpert.software.informer.com/download/ or https://www.traeger.de/downloads/doc_download/105-opc-ua-watch)
 3. Write a program that reads the data from a tag(StepUp for example). Check the [NetCoreConsoleClient](https://github.com/OPCFoundation/UA-.NETStandard/tree/master/SampleApplications/Samples/NetCoreConsoleClient)
+3.1. Check HelloOPC  https://github.com/pcbl/iot-grid/tree/master/Source/HelloOpc
 4. Start a Prometherus Docker: https://docs.docker.com/config/daemon/prometheus/
 5. Save Data to Prometheus instance
 6. Start a Gafana Docker: https://hub.docker.com/r/grafana/grafana/
