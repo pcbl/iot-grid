@@ -7,5 +7,6 @@ Demo Project targeting to use some interesting IOT related technologies
 
 **IOT-Server**
 To run a demo server
+```
 docker run --name OPCServer -p 1010:50000 mcr.microsoft.com/iotedge/opc-plc --aa
-
+```
