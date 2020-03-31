@@ -12,8 +12,14 @@ To run a demo server
 docker run --name OPCServer -p 1010:50000 mcr.microsoft.com/iotedge/opc-plc --aa
 ```
 
-**PlantUML Editor**
+**Some Tools and Information**
 
-Here is a cool PlantUML Online editor!
-
-https://plantuml-editor.kkeisuke.com/
+ - PlantUML Online Editor: https://plantuml-editor.kkeisuke.com/
+ - OPC UA.Net Core SDK: https://github.com/OPCFoundation/UA-.NETStandard
+   - Check the [NetCoreConsoleClient](https://github.com/OPCFoundation/UA-.NETStandard/tree/master/SampleApplications/Samples/NetCoreConsoleClient) for a lightweight sample
+ - OPC UA Expert (Client) - https://uaexpert.software.informer.com/download/
+ - Grafana: https://grafana.com/
+ - Prometheus: https://prometheus.io/
+ 
+ 
+  
