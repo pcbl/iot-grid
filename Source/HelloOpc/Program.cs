@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.FileExtensions;
 using Microsoft.Extensions.Configuration.Json;
 using HelloOpc;
+using System.Linq;
 
 namespace NetCoreConsoleClient
 {
@@ -258,30 +259,37 @@ namespace NetCoreConsoleClient
             exitCode = ExitCode.ErrorCreateSubscription;
             var subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000 };
 
-            IConfiguration configcmd = new ConfigurationBuilder()
+            IConfiguration configBuilder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true, true)
                 .Build();
-            var nodesettingsconfig = new nodesettings();
-            configcmd.GetSection("Subscription").Bind(nodesettingsconfig);
-            configcmd.GetSection("Subscriptions").Bind(nodesettingsconfig);
-            configcmd.GetSection("DataItems").Bind(nodesettingsconfig);
-            configcmd.GetSection("StepUp").Bind(nodesettingsconfig);
-            string ns = nodesettingsconfig.NsId;
-            string s = nodesettingsconfig.Id;
+            var configSettings = new SubscriptionDefinition();
+            configBuilder.GetSection("Subscription").Bind(configSettings);
+            //string ns = nodesettingsconfig.NsId;
+            //string s = nodesettingsconfig.Id;
 
-            Console.WriteLine("Namespace: "+ns);
-            Console.WriteLine("NodeId: "+s);
+         //   Console.WriteLine("Namespace: "+ns);
+            Console.WriteLine("NodeId: "+configSettings.DiscoveryUrl);
 
             //Console.WriteLine("6 - Add a list of items (server current time and status) to the subscription.");
             exitCode = ExitCode.ErrorMonitoredItem;
-            var list = new List<MonitoredItem> {
+            var list = configSettings.DataItems.Select(dataItem => new MonitoredItem(subscription.DefaultItem)
+            {
+                DisplayName = dataItem.Id,
+                StartNodeId = $"ns={dataItem.NsId};s={dataItem.Id}",
+            }).ToList();
+
+            /*var list = new List<MonitoredItem> {
+
+
                 new MonitoredItem(subscription.DefaultItem)
                 {
                     //DisplayName = "ServerStatusCurrentTime", StartNodeId = "i="+Variables.Server_ServerStatus_CurrentTime.ToString()
                     DisplayName = $"{nodesettingsconfig.Id}", StartNodeId = String.Format("ns={0};s={1}", ns,s)  
                 }
-            };
-            list.ForEach(i => i.Notification += OnNotification);
+            };*/
+            list.ForEach(dataItem=> dataItem.Notification += OnNotification);
+
+
             subscription.AddItems(list);
 
             //Console.WriteLine("7 - Add the subscription to the session.");
