@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloOpc", "HelloOpc.csproj", "{71184908-E2F4-4610-8CB5-51D722BAE917}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IotGrid.WebApi", "..\IotGrid.WebApi\IotGrid.WebApi.csproj", "{EED0289B-8A52-4CE9-8DC8-41CE3C36B3E7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IotGrid.OpcClient", "..\IotGrid.OpcClient\IotGrid.OpcClient.csproj", "{8A0E3FBE-8460-4BB8-A2C5-CC6768A4D23A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{71184908-E2F4-4610-8CB5-51D722BAE917}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71184908-E2F4-4610-8CB5-51D722BAE917}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71184908-E2F4-4610-8CB5-51D722BAE917}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EED0289B-8A52-4CE9-8DC8-41CE3C36B3E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EED0289B-8A52-4CE9-8DC8-41CE3C36B3E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EED0289B-8A52-4CE9-8DC8-41CE3C36B3E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EED0289B-8A52-4CE9-8DC8-41CE3C36B3E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A0E3FBE-8460-4BB8-A2C5-CC6768A4D23A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A0E3FBE-8460-4BB8-A2C5-CC6768A4D23A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A0E3FBE-8460-4BB8-A2C5-CC6768A4D23A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A0E3FBE-8460-4BB8-A2C5-CC6768A4D23A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
