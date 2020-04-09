@@ -1,32 +1,3 @@
-/* ========================================================================
- * Copyright (c) 2005-2019 The OPC Foundation, Inc. All rights reserved.
- *
- * OPC Foundation MIT License 1.00
- * 
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- * 
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- *
- * The complete license agreement can be found here:
- * http://opcfoundation.org/License/MIT/1.00/
- * ======================================================================*/
-
 using Mono.Options;
 using Opc.Ua;
 using Opc.Ua.Client;
@@ -35,6 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.FileExtensions;
+using Microsoft.Extensions.Configuration.Json;
+using HelloOpc;
+using System.Linq;
 
 namespace NetCoreConsoleClient
 {
@@ -58,9 +34,10 @@ namespace NetCoreConsoleClient
     {
         public static int Main(string[] args)
         {
-            Console.WriteLine(
+            /*Console.WriteLine(
                 (Utils.IsRunningOnMono() ? "Mono" : ".Net Core") +
                 " OPC UA Console Client sample");
+            */
 
             // command line options
             bool showHelp = false;
@@ -186,7 +163,7 @@ namespace NetCoreConsoleClient
 
         private async Task ConsoleSampleClient()
         {
-            Console.WriteLine("1 - Create an Application Configuration.");
+            //Console.WriteLine("1 - Create an Application Configuration.");
             exitCode = ExitCode.ErrorCreateApplication;
 
             ApplicationInstance application = new ApplicationInstance
@@ -220,13 +197,13 @@ namespace NetCoreConsoleClient
                 Console.WriteLine("    WARN: missing application certificate, using unsecure connection.");
             }
 
-            Console.WriteLine("2 - Discover endpoints of {0}.", endpointURL);
+            //Console.WriteLine("2 - Discover endpoints of {0}.", endpointURL);
             exitCode = ExitCode.ErrorDiscoverEndpoints;
             var selectedEndpoint = CoreClientUtils.SelectEndpoint(endpointURL, haveAppCertificate, 15000);
-            Console.WriteLine("    Selected endpoint uses: {0}",
-                selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1));
+            //Console.WriteLine("    Selected endpoint uses: {0}",
+              //  selectedEndpoint.SecurityPolicyUri.Substring(selectedEndpoint.SecurityPolicyUri.LastIndexOf('#') + 1));
 
-            Console.WriteLine("3 - Create a session with OPC UA server.");
+            //Console.WriteLine("3 - Create a session with OPC UA server.");
             exitCode = ExitCode.ErrorCreateSession;
             var endpointConfiguration = EndpointConfiguration.Create(config);
             var endpoint = new ConfiguredEndpoint(null, selectedEndpoint, endpointConfiguration);
@@ -235,7 +212,7 @@ namespace NetCoreConsoleClient
             // register keep alive handler
             session.KeepAlive += Client_KeepAlive;
 
-            Console.WriteLine("4 - Browse the OPC UA server namespace.");
+            //Console.WriteLine("4 - Browse the OPC UA server namespace.");
             exitCode = ExitCode.ErrorBrowseNamespace;
             ReferenceDescriptionCollection references;
             Byte[] continuationPoint;
@@ -254,10 +231,10 @@ namespace NetCoreConsoleClient
                 out continuationPoint,
                 out references);
 
-            Console.WriteLine(" DisplayName, BrowseName, NodeClass");
+            //Console.WriteLine(" DisplayName, BrowseName, NodeClass");
             foreach (var rd in references)
             {
-                Console.WriteLine(" {0}, {1}, {2}", rd.DisplayName, rd.BrowseName, rd.NodeClass);
+                //Console.WriteLine(" {0}, {1}, {2}", rd.DisplayName, rd.BrowseName, rd.NodeClass);
                 ReferenceDescriptionCollection nextRefs;
                 byte[] nextCp;
                 session.Browse(
@@ -271,34 +248,56 @@ namespace NetCoreConsoleClient
                     (uint)NodeClass.Variable | (uint)NodeClass.Object | (uint)NodeClass.Method,
                     out nextCp,
                     out nextRefs);
-
+                /*
                 foreach (var nextRd in nextRefs)
                 {
                     Console.WriteLine("   + {0}, {1}, {2}", nextRd.DisplayName, nextRd.BrowseName, nextRd.NodeClass);
-                }
+                }*/
             }
 
-            Console.WriteLine("5 - Create a subscription with publishing interval of 1 second.");
+            //Console.WriteLine("5 - Create a subscription with publishing interval of 1 second.");
             exitCode = ExitCode.ErrorCreateSubscription;
             var subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000 };
 
-            Console.WriteLine("6 - Add a list of items (server current time and status) to the subscription.");
+            IConfiguration configBuilder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
+            var configSettings = new SubscriptionDefinition();
+            configBuilder.GetSection("Subscription").Bind(configSettings);
+            //string ns = nodesettingsconfig.NsId;
+            //string s = nodesettingsconfig.Id;
+
+         //   Console.WriteLine("Namespace: "+ns);
+            Console.WriteLine("NodeId: "+configSettings.DiscoveryUrl);
+
+            //Console.WriteLine("6 - Add a list of items (server current time and status) to the subscription.");
             exitCode = ExitCode.ErrorMonitoredItem;
-            var list = new List<MonitoredItem> {
+            var list = configSettings.DataItems.Select(dataItem => new MonitoredItem(subscription.DefaultItem)
+            {
+                DisplayName = dataItem.Id,
+                StartNodeId = $"ns={dataItem.NsId};s={dataItem.Id}",
+            }).ToList();
+
+            /*var list = new List<MonitoredItem> {
+
+
                 new MonitoredItem(subscription.DefaultItem)
                 {
-                    DisplayName = "ServerStatusCurrentTime", StartNodeId = "i="+Variables.Server_ServerStatus_CurrentTime.ToString()
+                    //DisplayName = "ServerStatusCurrentTime", StartNodeId = "i="+Variables.Server_ServerStatus_CurrentTime.ToString()
+                    DisplayName = $"{nodesettingsconfig.Id}", StartNodeId = String.Format("ns={0};s={1}", ns,s)  
                 }
-            };
-            list.ForEach(i => i.Notification += OnNotification);
+            };*/
+            list.ForEach(dataItem=> dataItem.Notification += OnNotification);
+
+
             subscription.AddItems(list);
 
-            Console.WriteLine("7 - Add the subscription to the session.");
+            //Console.WriteLine("7 - Add the subscription to the session.");
             exitCode = ExitCode.ErrorAddSubscription;
             session.AddSubscription(subscription);
             subscription.Create();
 
-            Console.WriteLine("8 - Running...Press Ctrl-C to exit...");
+            Console.WriteLine("Running...Press Ctrl-C to exit...");
             exitCode = ExitCode.ErrorRunning;
         }
 
